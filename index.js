@@ -4,6 +4,7 @@
     var Timer = function(msec){
       this._restMsec = msec;
       this.onTick = [];
+      this.onStop = [];
       this.onComplete = [];
       this._stopNext = false;
     }
@@ -18,6 +19,7 @@
       if(this._restMsec < 0){
         this._restMsec = 0;
         this.onTick.forEach(function(x){x(self._restMsec);});
+        this.onStop.forEach(function(x){x();});
         this.onComplete.forEach(function(x){x();});
         clearInterval(this._intervalId);
         return;
@@ -25,7 +27,7 @@
 
       if(this._stopNext){
         this.onTick.forEach(function(x){x(self._restMsec);});
-        this.onComplete.forEach(function(x){x();});
+        this.onStop.forEach(function(x){x();});
         clearInterval(this._intervalId);
         this._stopNext = false;
         return;
@@ -75,10 +77,14 @@
       updateDisplay(min, sec, ms);
     });
 
-    timer.onComplete.push(function(){
+    timer.onStop.push(function(){
       $("#start-btn").css("display", "inline-block");
       $("#stop-btn").css("display", "none");
       $("#time-config").css("display", "block");
+    });
+
+    timer.onComplete.push(function(){
+      //TODO:disable Start button
     });
     timer.start();
 
