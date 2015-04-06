@@ -59,7 +59,7 @@
   function applyTimeConfig(){
     var min = $("#min-input").val() || 0;
     var sec = $("#sec-input").val() || 0;
-    updateDisplay(min,sec,0);
+    updateDisplay(min, sec, 0);
   }
 
   function startTimer(){
@@ -107,7 +107,12 @@
   });
 
 
-  $("#apply-btn").click(function(){
+  $(".nmin-apply-btn").click(function(){
+    var min = parseInt($(this).attr("data-x-min"));
+    updateDisplay(min, 0, 0);
+  });
+
+  $("#xmin-apply-btn").click(function(){
     applyTimeConfig();
   });
 
