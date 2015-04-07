@@ -96,6 +96,8 @@
     TimerController.prototype.applyCustomTimeInput = function(){
       var min = parseInt($("#min-input").val(), 10) || 0;
       var sec = parseInt($("#sec-input").val(), 10) || 0;
+      min = min < 0 ? 0 : min;
+      sec = sec < 0 ? 0 : sec;
       this.applyTime(min, sec, 0);
     };
 
