@@ -1,5 +1,6 @@
 body {
   font-family:Helvetica;
+  font-size:2em;
 }
 
 #time-container {
@@ -7,7 +8,7 @@ body {
 }
 
 #time {
-  font-size:10em;
+  font-size:12em;
 }
 
 #time-ms {
