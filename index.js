@@ -3,7 +3,8 @@
 
   var Timer = (function(){
     var Timer = function(msec){
-      this._restMsec = msec;
+      this._countMsec = msec;
+      this._elapsedOffset = 0;
       this.onTick = [];
       this.onStop = [];
       this.onComplete = [];
@@ -13,13 +14,12 @@
     Timer.prototype.tick = function(){
       var self = this;
       var now = Date.now();
-      var diff = now - this._prevTime;
-      this._prevTime = now;
-      this._restMsec -= diff;
+      var diff = now - this._startTime;
+      var currentMsec = this._countMsec - diff - this._elapsedOffset;
 
-      if(this._restMsec < 0){
-        this._restMsec = 0;
-        this.onTick.forEach(function(x){x(self._restMsec);});
+      if(currentMsec < 0){
+        currentMsec = 0;
+        this.onTick.forEach(function(x){x(currentMsec);});
         this.onStop.forEach(function(x){x();});
         this.onComplete.forEach(function(x){x();});
         clearInterval(this._intervalId);
@@ -27,19 +27,20 @@
       }
 
       if(this._stopNext){
-        this.onTick.forEach(function(x){x(self._restMsec);});
-        this.onStop.forEach(function(x){x();});
         clearInterval(this._intervalId);
+        this._elapsedOffset += diff;
+        this.onTick.forEach(function(x){x(currentMsec);});
+        this.onStop.forEach(function(x){x();});
         this._stopNext = false;
         return;
       }
 
-      this.onTick.forEach(function(x){x(self._restMsec);});
+      this.onTick.forEach(function(x){x(currentMsec);});
     };
 
     Timer.prototype.start = function(){
       var self = this;
-      this._prevTime = Date.now();
+      this._startTime = Date.now();
       this.tick();
       this._intervalId = setInterval(function(){self.tick();}, 25);
     };
