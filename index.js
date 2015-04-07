@@ -56,6 +56,7 @@
       $("#time-min").text(("0"+min).slice(-2));
       $("#time-sec").text(("0"+sec).slice(-2));
       $("#time-ms").text(("0"+ms).slice(-2));
+      $("#start-btn").removeAttr("disabled");
   }
 
   function applyTimeConfig(){
@@ -87,9 +88,9 @@
     var tx = $("#time");
     var origColor = tx.css("color");
     tx
-      .animate({color: "#2244FF"},150)
+      .animate({color: "#2244FF"},200)
       .animate({color: origColor},{
-        duration: 500,
+        duration: 800,
         complete: function(){tx.css("color","")
         }});
   }
@@ -119,7 +120,7 @@
     });
 
     timer.onComplete.push(function(){
-      //TODO:disable Start button
+      $("#start-btn").attr("disabled", "");
       highlightTime();
     });
     timer.start();
