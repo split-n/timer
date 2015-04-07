@@ -55,7 +55,7 @@
 
   var TimerController = (function(){
     function TimerController(config){
-      this._config = config || {blinkSec:10};
+      this._config = config;
       this._origTimeColor = $("#time").css("color");
     }
 
@@ -69,6 +69,9 @@
       }
 
       $("#time-ms").text(("0"+ms).slice(-2));
+      if(min===0&&sec===0&&ms===0){
+        $("#start-btn").attr("disabled", "");
+      }
       this._prevUpdateValue = {min: min, sec: sec, ms: ms};
     };
 
@@ -90,7 +93,7 @@
     TimerController.prototype._highlightSec = function(){
       var ts = $("#time-sec");
       ts
-        .animate({color: "#FF0000"},150)
+        .animate({color: this._config.countdownBlink.color},150)
         .animate({color: this._origTimeColor},{
             duration: 500,
             complete: function(){ts.css("color","");}
@@ -100,7 +103,7 @@
     TimerController.prototype._highlightTime = function(){
       var tx = $("#time");
       tx
-        .animate({color: "#2244FF"},200)
+        .animate({color: this._config.completedBlink.color},200)
         .animate({color: this._origTimeColor},{
           duration: 800,
           complete: function(){tx.css("color","");}
@@ -119,7 +122,7 @@
         var ms = Math.floor(msec%1000/10);
 
         if(min === 0 && lastTickSec !== undefined &&
-            lastTickSec <= self._config.blinkSec && lastTickSec != sec){
+            lastTickSec <= self._config.countdownBlink.sec && lastTickSec != sec){
           self._highlightSec();
         }
         self.updateDisplay(min, sec, ms);
@@ -133,7 +136,6 @@
       });
 
       this._timer.onComplete.push(function(){
-        $("#start-btn").attr("disabled", "");
         self._highlightTime();
       });
       this._timer.start();
@@ -151,7 +153,12 @@
   })();
 //== end TimerController decl.
 
-  var currentTimerController = new TimerController();
+  var config = {
+    countdownBlink:{sec:10,color:"#FF0000"},
+    completedBlink:{color:"#2244FF"}
+  }
+
+  var currentTimerController = new TimerController(config);
 
   $("#start-btn").click(function(){
     currentTimerController.start();
