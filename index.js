@@ -53,118 +53,126 @@
   })();
 //== end Timer decl.
 
-  function updateDisplay(min, sec, ms){
-      var mint = ("0"+min).slice(-2);
-      if($("#time-min").text() !== mint){
-        $("#time-min").text(mint);
+  var TimerController = (function(){
+    function TimerController(config){
+      this._config = config || {blinkSec:10};
+      this._origTimeColor = $("#time").css("color");
+    }
+
+    TimerController.prototype.updateDisplay = function(min, sec, ms){
+      if(this._prevUpdateValue === undefined || this._prevUpdateValue.min !== min){
+          $("#time-min").text(("0"+min).slice(-2));
       }
 
-      var sect = ("0"+sec).slice(-2);
-      if($("#time-sec").text() !== sect){
-        $("#time-sec").text(sect);
+      if(this._prevUpdateValue === undefined || this._prevUpdateValue.sec !== sec){
+          $("#time-sec").text(("0"+sec).slice(-2));
       }
 
       $("#time-ms").text(("0"+ms).slice(-2));
-  }
+      this._prevUpdateValue = {min: min, sec: sec, ms: ms};
+    };
 
-  function applyTimeConfig(){
-    var min = $("#min-input").val() || 0;
-    var sec = $("#sec-input").val() || 0;
-    updateDisplay(min, sec, 0);
-    $("#start-btn").removeAttr("disabled");
-  }
+    TimerController.prototype.applyTimeConfig = function(){
+      var min = $("#min-input").val() || 0;
+      var sec = $("#sec-input").val() || 0;
+      this.updateDisplay(min, sec, 0);
+      $("#start-btn").removeAttr("disabled");
+    };
 
-  function parseTimeAsMsec(){
-    var min = $("#time-min").text();
-    var sec = $("#time-sec").text();
-    var ms = $("#time-ms").text();
-    var msec = parseInt(min)*60*1000 + parseInt(sec)*1000 + parseInt(ms);
-    return msec;
-  }
+    TimerController.prototype.parseTimeAsMsec = function(){
+      var min = $("#time-min").text();
+      var sec = $("#time-sec").text();
+      var ms = $("#time-ms").text();
+      var msec = parseInt(min)*60*1000 + parseInt(sec)*1000 + parseInt(ms);
+      return msec;
+    };
 
-  function highlightSec(){
-    var ts = $("#time-sec");
-    var origColor = ts.css("color");
-    ts
-      .animate({color: "#FF0000"},150)
-      .animate({color: origColor},{
-          duration: 500,
-          complete: function(){ts.css("color","");}
+    TimerController.prototype._highlightSec = function(){
+      var ts = $("#time-sec");
+      ts
+        .animate({color: "#FF0000"},150)
+        .animate({color: this._origTimeColor},{
+            duration: 500,
+            complete: function(){ts.css("color","");}
+        });
+    };
+
+    TimerController.prototype._highlightTime = function(){
+      var tx = $("#time");
+      tx
+        .animate({color: "#2244FF"},200)
+        .animate({color: this._origTimeColor},{
+          duration: 800,
+          complete: function(){tx.css("color","");}
+        });
+    };
+
+    TimerController.prototype.start = function(){
+      var self = this;
+      var msec = this.parseTimeAsMsec();
+      this._timer = new Timer(msec);
+
+      var lastTickSec;
+      this._timer.onTick.push(function(msec){
+        var min = Math.floor(msec/1000/60);
+        var sec = Math.floor(msec/1000%60);
+        var ms = Math.floor(msec%1000/10);
+
+        if(min === 0 && lastTickSec !== undefined &&
+            lastTickSec <= self._config.blinkSec && lastTickSec != sec){
+          self._highlightSec();
+        }
+        self.updateDisplay(min, sec, ms);
+        lastTickSec = sec;
       });
-  }
 
-  function highlightTime(){
-    var tx = $("#time");
-    var origColor = tx.css("color");
-    tx
-      .animate({color: "#2244FF"},200)
-      .animate({color: origColor},{
-        duration: 800,
-        complete: function(){tx.css("color","");}
+      this._timer.onStop.push(function(){
+        $("#start-btn").css("display", "inline-block");
+        $("#stop-btn").css("display", "none");
+        $("#time-config").css("display", "block");
       });
-  }
 
-  function startTimer(){
-    var msec = parseTimeAsMsec();
-    var timer = new Timer(msec);
+      this._timer.onComplete.push(function(){
+        $("#start-btn").attr("disabled", "");
+        self._highlightTime();
+      });
+      this._timer.start();
 
-    var lastTickSec;
-    timer.onTick.push(function(msec){
-      var min = Math.floor(msec/1000/60);
-      var sec = Math.floor(msec/1000%60);
-      var ms = Math.floor(msec%1000/10);
+      $("#start-btn").css("display", "none");
+      $("#stop-btn").css("display", "inline-block");
+      $("#time-config").css("display", "none");
+    };
 
-      if(min === 0 && lastTickSec !== undefined &&
-          lastTickSec <= 10 && lastTickSec != sec){
-        highlightSec();
-      }
-      updateDisplay(min, sec, ms);
-      lastTickSec = sec;
-    });
+    TimerController.prototype.stop = function(){
+      this._timer.stop();
+    };
 
-    timer.onStop.push(function(){
-      $("#start-btn").css("display", "inline-block");
-      $("#stop-btn").css("display", "none");
-      $("#time-config").css("display", "block");
-    });
+    return TimerController;
+  })();
+//== end TimerController decl.
 
-    timer.onComplete.push(function(){
-      $("#start-btn").attr("disabled", "");
-      highlightTime();
-    });
-    timer.start();
-
-    $("#start-btn").css("display", "none");
-    $("#stop-btn").css("display", "inline-block");
-    $("#time-config").css("display", "none");
-
-    return timer;
-  }
-//== end functions decl.
-
-  var currentTimer;
+  var currentTimerController = new TimerController();
 
   $("#start-btn").click(function(){
-    currentTimer = startTimer();
+    currentTimerController.start();
   });
 
   $("#stop-btn").click(function(){
-    currentTimer.stop();
-    currentTimer = null;
+    currentTimerController.stop();
   });
 
 
   $(".nmin-apply-btn").click(function(){
     var min = parseInt($(this).attr("data-x-min"));
-    updateDisplay(min, 0, 0);
+    currentTimerController.updateDisplay(min, 0, 0);
     $("#start-btn").removeAttr("disabled");
   });
 
   $("#xmin-apply-btn").click(function(){
-    applyTimeConfig();
+    currentTimerController.applyTimeConfig();
   });
 
-  applyTimeConfig();
+  currentTimerController.applyTimeConfig();
 
 })();
 
