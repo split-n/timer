@@ -59,6 +59,46 @@
       this._origTimeColor = $("#time").css("color");
     }
 
+    TimerController.prototype.start = function(){
+      var self = this;
+
+      var lastTickSec;
+      this._timer.onTick.push(function(msec){
+        var min = Math.floor(msec/1000/60);
+        var sec = Math.floor(msec/1000%60);
+
+        if(min === 0 && lastTickSec !== undefined &&
+            lastTickSec <= self._config.countdownBlink.sec && lastTickSec > sec){
+          self._highlightSec();
+        }
+        self.updateDisplay(msec);
+        lastTickSec = sec;
+      });
+
+      this._timer.onStop.push(function(msec){
+        self._timer = null;
+        self.applyTimeMsec(msec);
+        $("#start-btn").css("display", "inline-block");
+        $("#stop-btn").css("display", "none");
+        $("#time-config").css("display", "block");
+      });
+
+      this._timer.onComplete.push(function(){
+        self._highlightTime();
+      });
+
+      this._timer.start();
+
+      $("#start-btn").css("display", "none");
+      $("#stop-btn").css("display", "inline-block");
+      $("#time-config").css("display", "none");
+    };
+
+    TimerController.prototype.stop = function(){
+      this._timer.stop();
+    };
+
+
     TimerController.prototype.updateDisplay = function(msec){
       var min = Math.floor(msec/1000/60);
       var sec = Math.floor(msec/1000%60);
@@ -121,46 +161,9 @@
         });
     };
 
-    TimerController.prototype.start = function(){
-      var self = this;
-
-      var lastTickSec;
-      this._timer.onTick.push(function(msec){
-        var min = Math.floor(msec/1000/60);
-        var sec = Math.floor(msec/1000%60);
-
-        if(min === 0 && lastTickSec !== undefined &&
-            lastTickSec <= self._config.countdownBlink.sec && lastTickSec > sec){
-          self._highlightSec();
-        }
-        self.updateDisplay(msec);
-        lastTickSec = sec;
-      });
-
-      this._timer.onStop.push(function(msec){
-        self._timer = null;
-        self.applyTimeMsec(msec);
-        $("#start-btn").css("display", "inline-block");
-        $("#stop-btn").css("display", "none");
-        $("#time-config").css("display", "block");
-      });
-
-      this._timer.onComplete.push(function(){
-        self._highlightTime();
-      });
-      this._timer.start();
-
-      $("#start-btn").css("display", "none");
-      $("#stop-btn").css("display", "inline-block");
-      $("#time-config").css("display", "none");
-    };
-
-    TimerController.prototype.stop = function(){
-      this._timer.stop();
-    };
-
     return TimerController;
   })();
+
 //== end TimerController decl.
 
   var config = {
