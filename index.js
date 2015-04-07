@@ -20,7 +20,7 @@
       if(currentMsec < 0){
         currentMsec = 0;
         this.onTick.forEach(function(x){x(currentMsec);});
-        this.onStop.forEach(function(x){x();});
+        this.onStop.forEach(function(x){x(currentMsec);});
         this.onComplete.forEach(function(x){x();});
         clearInterval(this._intervalId);
         return;
@@ -30,7 +30,7 @@
         clearInterval(this._intervalId);
         this._elapsedOffset += diff;
         this.onTick.forEach(function(x){x(currentMsec);});
-        this.onStop.forEach(function(x){x();});
+        this.onStop.forEach(function(x){x(currentMsec);});
         this._stopNext = false;
         return;
       }
@@ -59,35 +59,44 @@
       this._origTimeColor = $("#time").css("color");
     }
 
-    TimerController.prototype.updateDisplay = function(min, sec, ms){
-      if(this._prevUpdateValue === undefined || this._prevUpdateValue.min !== min){
+    TimerController.prototype.updateDisplay = function(msec){
+      var min = Math.floor(msec/1000/60);
+      var sec = Math.floor(msec/1000%60);
+      var ms = Math.floor(msec%1000/10);
+
+      if(this._prevUpdateDisp === undefined || this._prevUpdateDisp.min !== min){
           $("#time-min").text(("0"+min).slice(-2));
       }
 
-      if(this._prevUpdateValue === undefined || this._prevUpdateValue.sec !== sec){
+      if(this._prevUpdateDisp === undefined || this._prevUpdateDisp.sec !== sec){
           $("#time-sec").text(("0"+sec).slice(-2));
       }
 
       $("#time-ms").text(("0"+ms).slice(-2));
-      if(min===0&&sec===0&&ms===0){
-        $("#start-btn").attr("disabled", "");
-      }
-      this._prevUpdateValue = {min: min, sec: sec, ms: ms};
+      this._prevUpdateDisp = {min: min, sec: sec, ms: ms};
     };
 
-    TimerController.prototype.applyTimeConfig = function(){
-      $("#start-btn").removeAttr("disabled");
+    TimerController.prototype.applyTime = function(min, sec, ms){
+      var msec = min*60*1000 + sec*1000 + ms;
+      this.applyTimeMsec(msec);
+    };
+
+    TimerController.prototype.applyTimeMsec = function(msec){
+      if(msec > 0){
+        $("#start-btn").removeAttr("disabled");
+        this._timer = new Timer(msec);
+        this.updateDisplay(msec);
+      } else {
+        $("#start-btn").attr("disabled","");
+        this.updateDisplay(msec);
+        this._timer = null;
+      }
+    };
+
+    TimerController.prototype.applyCustomTimeInput = function(){
       var min = parseInt($("#min-input").val()) || 0;
       var sec = parseInt($("#sec-input").val()) || 0;
-      this.updateDisplay(min, sec, 0);
-    };
-
-    TimerController.prototype.parseTimeAsMsec = function(){
-      var min = $("#time-min").text();
-      var sec = $("#time-sec").text();
-      var ms = $("#time-ms").text();
-      var msec = parseInt(min)*60*1000 + parseInt(sec)*1000 + parseInt(ms);
-      return msec;
+      this.applyTime(min, sec, 0);
     };
 
     TimerController.prototype._highlightSec = function(){
@@ -112,24 +121,23 @@
 
     TimerController.prototype.start = function(){
       var self = this;
-      var msec = this.parseTimeAsMsec();
-      this._timer = new Timer(msec);
 
       var lastTickSec;
       this._timer.onTick.push(function(msec){
         var min = Math.floor(msec/1000/60);
         var sec = Math.floor(msec/1000%60);
-        var ms = Math.floor(msec%1000/10);
 
         if(min === 0 && lastTickSec !== undefined &&
-            lastTickSec <= self._config.countdownBlink.sec && lastTickSec != sec){
+            lastTickSec <= self._config.countdownBlink.sec && lastTickSec > sec){
           self._highlightSec();
         }
-        self.updateDisplay(min, sec, ms);
+        self.updateDisplay(msec);
         lastTickSec = sec;
       });
 
-      this._timer.onStop.push(function(){
+      this._timer.onStop.push(function(msec){
+        self._timer = null;
+        self.applyTimeMsec(msec);
         $("#start-btn").css("display", "inline-block");
         $("#stop-btn").css("display", "none");
         $("#time-config").css("display", "block");
@@ -171,15 +179,14 @@
 
   $(".nmin-apply-btn").click(function(){
     var min = parseInt($(this).attr("data-x-min"));
-    currentTimerController.updateDisplay(min, 0, 0);
-    $("#start-btn").removeAttr("disabled");
+    currentTimerController.applyTime(min, 0, 0);
   });
 
   $("#xmin-apply-btn").click(function(){
-    currentTimerController.applyTimeConfig();
+    currentTimerController.applyCustomTimeInput();
   });
 
-  currentTimerController.applyTimeConfig();
+  currentTimerController.applyCustomTimeInput();
 
 })();
 
