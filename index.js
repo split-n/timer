@@ -76,10 +76,10 @@
     };
 
     TimerController.prototype.applyTimeConfig = function(){
-      var min = $("#min-input").val() || 0;
-      var sec = $("#sec-input").val() || 0;
-      this.updateDisplay(min, sec, 0);
       $("#start-btn").removeAttr("disabled");
+      var min = parseInt($("#min-input").val()) || 0;
+      var sec = parseInt($("#sec-input").val()) || 0;
+      this.updateDisplay(min, sec, 0);
     };
 
     TimerController.prototype.parseTimeAsMsec = function(){
