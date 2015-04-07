@@ -54,16 +54,24 @@
 //== end Timer decl.
 
   function updateDisplay(min, sec, ms){
-      $("#time-min").text(("0"+min).slice(-2));
-      $("#time-sec").text(("0"+sec).slice(-2));
+      var mint = ("0"+min).slice(-2);
+      if($("#time-min").text() !== mint){
+        $("#time-min").text(mint);
+      }
+
+      var sect = ("0"+sec).slice(-2);
+      if($("#time-sec").text() !== sect){
+        $("#time-sec").text(sect);
+      }
+
       $("#time-ms").text(("0"+ms).slice(-2));
-      $("#start-btn").removeAttr("disabled");
   }
 
   function applyTimeConfig(){
     var min = $("#min-input").val() || 0;
     var sec = $("#sec-input").val() || 0;
     updateDisplay(min, sec, 0);
+    $("#start-btn").removeAttr("disabled");
   }
 
   function parseTimeAsMsec(){
@@ -149,6 +157,7 @@
   $(".nmin-apply-btn").click(function(){
     var min = parseInt($(this).attr("data-x-min"));
     updateDisplay(min, 0, 0);
+    $("#start-btn").removeAttr("disabled");
   });
 
   $("#xmin-apply-btn").click(function(){
