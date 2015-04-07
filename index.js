@@ -2,7 +2,7 @@
   "use strict";
 
   var Timer = (function(){
-    var Timer = function(msec){
+    function Timer(msec){
       this._countMsec = msec;
       this._elapsedOffset = 0;
       this.onTick = [];
@@ -81,8 +81,8 @@
       .animate({color: "#FF0000"},150)
       .animate({color: origColor},{
           duration: 500,
-          complete: function(){ts.css("color","")
-          }});
+          complete: function(){ts.css("color","");}
+      });
   }
 
   function highlightTime(){
@@ -92,8 +92,8 @@
       .animate({color: "#2244FF"},200)
       .animate({color: origColor},{
         duration: 800,
-        complete: function(){tx.css("color","")
-        }});
+        complete: function(){tx.css("color","");}
+      });
   }
 
   function startTimer(){
