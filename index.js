@@ -94,8 +94,8 @@
     };
 
     TimerController.prototype.applyCustomTimeInput = function(){
-      var min = parseInt($("#min-input").val()) || 0;
-      var sec = parseInt($("#sec-input").val()) || 0;
+      var min = parseInt($("#min-input").val(), 10) || 0;
+      var sec = parseInt($("#sec-input").val(), 10) || 0;
       this.applyTime(min, sec, 0);
     };
 
@@ -178,7 +178,7 @@
 
 
   $(".nmin-apply-btn").click(function(){
-    var min = parseInt($(this).attr("data-x-min"));
+    var min = parseInt($(this).attr("data-x-min"), 10);
     currentTimerController.applyTime(min, 0, 0);
   });
 
