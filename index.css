@@ -9,10 +9,18 @@ body {
 
 #time {
   font-size:12em;
+  text-align:center;
+}
+
+#time-main {
+  position:relative;
+  width:100%;
 }
 
 #time-ms {
-  font-size:0.5em;
+  font-size:0.3em;
+  position:absolute;
+  top:2.5em;
 }
 
 #main-button {
