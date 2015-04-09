@@ -4,6 +4,7 @@
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
 
     <link rel="stylesheet" href="lib/cosmo_bootstrap.min.css">
+    <link rel="stylesheet" href="lib/gh-fork-ribbon.css">
     <link rel="stylesheet" href="index.css">
     <script src="lib/jquery.min.js"></script>
     <script src="lib/jquery.color.min.js"></script>
@@ -11,39 +12,46 @@
     <title>timer</title>
   </head>
   <body>
+    <div class="github-fork-ribbon-wrapper right">
+      <div class="github-fork-ribbon">
+        <a href="https://github.com/split-n/timer">Fork me on GitHub</a>
+      </div>
+    </div>
     <nav class="navbar navbar-inverse">
       <p class="navbar-text">Timer</p>
     </nav>
-    <div id="time-container" class="text-center">
-      <p id="time">
-        <span id="time-min">00</span>:<span id="time-sec">00</span><span id="time-ms">00</span>
-      </p>
-    </div>
-
-    <div id="controller">
-      <div id="main-button" class="text-center">
-        <button id="start-btn" class="btn btn-primary btn-lg">Start</button>
-        <button id="stop-btn" class="btn btn-danger btn-lg" style="display:none;" >Stop</button>
+    <main>
+      <div id="time-container" class="text-center">
+        <p id="time">
+          <span id="time-min">00</span>:<span id="time-sec">00</span><span id="time-ms">00</span>
+        </p>
       </div>
-      <div id="time-config" class="text-center">
-        <div>
-          <ul class="list-inline">
-            <li><button class="btn btn-success btn-sm nmin-apply-btn" data-x-min="2">2 min</button></li>
-            <li><button class="btn btn-success btn-sm nmin-apply-btn" data-x-min="3">3 min</button></li>
-            <li><button class="btn btn-success btn-sm nmin-apply-btn" data-x-min="5">5 min</button></li>
-            <li><button class="btn btn-success btn-sm nmin-apply-btn" data-x-min="10">10 min</button></li>
-          </ul>
+
+      <div id="controller">
+        <div id="main-button" class="text-center">
+          <button id="start-btn" class="btn btn-primary btn-lg">Start</button>
+          <button id="stop-btn" class="btn btn-danger btn-lg" style="display:none;" >Stop</button>
         </div>
-        <div>
-          <p>
-          <input type="text" id="min-input" value="1"/> min 
-          <input type="text" id="sec-input" value="30"/> sec
-          <button id="xmin-apply-btn" class="btn btn-success btn-sm">Apply</button>
-          </p>
+        <div id="time-config" class="text-center">
+          <div>
+            <ul class="list-inline">
+              <li><button class="btn btn-success btn-sm nmin-apply-btn" data-x-min="2">2 min</button></li>
+              <li><button class="btn btn-success btn-sm nmin-apply-btn" data-x-min="3">3 min</button></li>
+              <li><button class="btn btn-success btn-sm nmin-apply-btn" data-x-min="5">5 min</button></li>
+              <li><button class="btn btn-success btn-sm nmin-apply-btn" data-x-min="10">10 min</button></li>
+            </ul>
+          </div>
+          <div>
+            <p>
+              <input type="text" id="min-input" value="1"/> min 
+              <input type="text" id="sec-input" value="30"/> sec
+              <button id="xmin-apply-btn" class="btn btn-success btn-sm">Apply</button>
+            </p>
+          </div>
         </div>
       </div>
-    </div>
+    </main>
 
-  <script src="index.js"></script>
+    <script src="index.js"></script>
   </body>
 </html>
