@@ -1,3 +1,10 @@
+@font-face {
+  font-family: '7segb';
+  src: url('lib/DSEG7Classic-Bold.woff'),
+       url('lib/DSEG7Classic-Bold.ttf') format('truetype');
+
+}
+
 body {
   font-family:Helvetica;
   font-size:2em;
@@ -8,7 +15,8 @@ body {
 }
 
 #time {
-  font-size:12em;
+  font-size:10em;
+  font-family: '7segb';
   text-align:center;
 }
 
